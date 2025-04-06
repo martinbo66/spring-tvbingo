@@ -29,22 +29,16 @@ databaseChangeLog:
               - column:
                   name: game_title
                   type: varchar(255)
-                  constraints:
-                    nullable: false
               - column:
                   name: center_square
                   type: varchar(255)
-                  constraints:
-                    nullable: false
               - column:
                   name: phrases
                   type: text[]
-                  constraints:
-                    nullable: false
         - createIndex:
             schemaName: tvbingo_schema
             tableName: shows
             indexName: idx_shows_show_title
             columns:
               - column:
-                  name: show_title 
+                  name: show_title
