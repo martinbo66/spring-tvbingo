@@ -4,6 +4,9 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     default-schema: public
     liquibase-schema: public
+    url: jdbc:postgresql://localhost:5432/tvbingo
+    username: tvbingo_user
+    password: tvbingo_password
   
   test:
     database:
@@ -30,7 +33,7 @@ zonky:
 logging:
   level:
     org.springframework.test.context: WARN
-    org.springframework.test.context.cache: DEBUG
+    org.springframework.test.context.cache: INFO
     org.springframework.test.context.transaction: WARN
     org.springframework.beans: WARN
     org.springframework.core: WARN
