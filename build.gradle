@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.liquibase:liquibase-core'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
@@ -51,11 +52,12 @@ test {
 		// Add summary after tests complete
 		afterSuite { desc, result ->
 			if (!desc.parent) { // will match the outermost suite
-				println "\nTest Results:"
-				println "Run: ${result.testCount} tests"
-				println "Succeeded: ${result.successfulTestCount} tests"
-				println "Failed: ${result.failedTestCount} tests"
-				println "Skipped: ${result.skippedTestCount} tests"
+				def output = "Tests: ${result.testCount} total, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped"
+				def padding = 80 - output.length()
+				padding = padding < 0 ? 0 : padding
+				println "\n" + "-" * 80
+				print " " * (padding / 2) + output
+				println "\n" + "-" * 80
 			}
 		}
 	}
