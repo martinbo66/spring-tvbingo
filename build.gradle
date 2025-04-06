@@ -35,6 +35,28 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	
+	// Show test results in the console
+	testLogging {
+		events "passed", "skipped", "failed"
+		showExceptions true
+		showCauses true
+		showStackTraces true
+		
+		// Show test results as they happen
+		showStandardStreams = true
+		
+		// Add summary after tests complete
+		afterSuite { desc, result ->
+			if (!desc.parent) { // will match the outermost suite
+				println "\nTest Results:"
+				println "Run: ${result.testCount} tests"
+				println "Succeeded: ${result.successfulTestCount} tests"
+				println "Failed: ${result.failedTestCount} tests"
+				println "Skipped: ${result.skippedTestCount} tests"
+			}
+		}
+	}
 }
