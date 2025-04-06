@@ -1,0 +1,3 @@
+# Database credentials
+export TVBINGO_DB_USERNAME=tvbingo_user
+export TVBINGO_DB_PASSWORD=your_secure_password_here 
