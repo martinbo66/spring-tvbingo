@@ -1,0 +1,40 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+    liquibase-schema: public
+  
+  test:
+    database:
+      replace: none
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: tvbingo_schema
+
+management:
+  health:
+    db:
+      enabled: false
+
+zonky:
+  test:
+    database:
+      provider: embedded
+      postgres:
+        client:
+          properties:
+            currentSchema: tvbingo_schema
+
+logging:
+  level:
+    org.springframework.test.context: WARN
+    org.springframework.test.context.cache: DEBUG
+    org.springframework.test.context.transaction: WARN
+    org.springframework.beans: WARN
+    org.springframework.core: WARN
+    org.springframework.orm: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE 
