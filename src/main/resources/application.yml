@@ -2,7 +2,7 @@ spring:
   application:
     name: tvbingo
   datasource:
-    url: jdbc:postgresql://localhost:5432/tvbingo?currentSchema=tvbingo_schema
+    url: ${TVBINGO_DB_URL}
     username: ${TVBINGO_DB_USERNAME}
     password: ${TVBINGO_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
