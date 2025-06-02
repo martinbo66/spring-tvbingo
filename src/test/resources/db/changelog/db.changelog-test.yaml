@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - property:
+      name: now
+      value: now()
+      dbms: postgresql
+
+  - include:
+      file: db/changelog/changes/01-create-initial-schema.yaml
+
+  - include:
+      file: db/changelog/changes/02-add-show-title-unique-constraint.yaml 
