@@ -13,6 +13,19 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  ai:
+    mcp:
+      server:
+        name: tvbingo-mcp-server
+        version: 1.0.0
+        type: SYNC
+        instructions: "This server provides TV Bingo tools and resources"
+        sse-message-endpoint: /mcp/messages
+        capabilities:
+          tool: true
+          resource: true
+          prompt: true
+          completion: false
 
 logging:
   pattern:
@@ -20,3 +33,4 @@ logging:
   level:
     root: INFO
     com.tvbingo: DEBUG
+    org.springframework.ai: DEBUG
