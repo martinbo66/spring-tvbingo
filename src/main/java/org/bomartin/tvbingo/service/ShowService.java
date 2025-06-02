@@ -18,18 +18,25 @@ import java.util.stream.StreamSupport;
 @Service
 public class ShowService {
     private final ShowRepository showRepository;
-    
-    @Autowired
-    public ShowService(ShowRepository showRepository) {
-        this.showRepository = showRepository;
-    }
-    
+
     /**
      * Constructs a new ShowService with the given ShowRepository.
      *
      * @param showRepository the repository used for Show persistence operations
      */
-    @Tool(description = "Create a new show")
+    @Autowired
+    public ShowService(ShowRepository showRepository) {
+        this.showRepository = showRepository;
+    }
+
+    
+    /**
+     * Creates a new show entity and saves it in the repository.
+     *
+     * @param show the Show object containing the details of the show to create
+     * @return the created Show object after being saved in the repository
+     */
+    @Tool(name = "create_show", description = "Create a new show")
     public Show createShow(
             @ToolParam(description = "Show object to create") Show show
     ) {
@@ -42,7 +49,7 @@ public class ShowService {
      * @param id the ID of the show to retrieve
      * @return an Optional containing the Show if found, or empty if not found
      */
-    @Tool(description = "Get a show by ID")
+    @Tool(name = "get_show_by_id", description = "Get a show by ID")
     public Optional<Show> getShow(
             @ToolParam(description = "Show ID, e.g. 3") Long id
     ) {
@@ -54,7 +61,7 @@ public class ShowService {
      *
      * @return a list of all Show entities
      */
-    @Tool(description = "Get all shows")
+    @Tool(name = "get_all_shows", description = "Get all shows")
     public List<Show> getAllShows() {
         return StreamSupport.stream(showRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
@@ -67,12 +74,22 @@ public class ShowService {
      * @return the updated Show entity
      * @throws IllegalArgumentException if the Show ID is null
      */
-    @Tool(description = "Update an existing show. Provide a Show object with updated fields (must include id)")
-    public Show updateShow(
-            @ToolParam(description = "Show object with updated fields (must include id)") Show show
-    ) {
+    @Tool(
+            name = "update_show",
+            description = "Update an existing show. Provide a Show object with updated fields (must include id)")
+    public Show updateShow(Show show) {
+        if (show == null) {
+            throw new IllegalArgumentException("Show must not be null");
+        }
         if (show.getId() == null) {
             throw new IllegalArgumentException("Show ID must not be null for updates");
+        }
+        if (!showRepository.findById(show.getId()).isPresent()) {
+            throw new IllegalArgumentException("Show with ID " + show.getId() + " not found");
+        }
+        if (show.getShowTitle() != null && 
+            showRepository.existsByShowTitleExceptId(show.getShowTitle(), show.getId())) {
+            throw new IllegalArgumentException("Show title must be unique");
         }
         return showRepository.save(show);
     }
@@ -85,4 +102,4 @@ public class ShowService {
     public void deleteShow(Long id) {
         showRepository.deleteById(id);
     }
-} 
+}
