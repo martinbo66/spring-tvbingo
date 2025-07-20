@@ -32,6 +32,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(
+            IllegalArgumentException ex) {
+        Map<String, String> errors = new HashMap<>();
+        
+        if (ex.getMessage().contains("Show title must be unique")) {
+            errors.put("showTitle", ex.getMessage());
+        } else {
+            errors.put("error", ex.getMessage());
+        }
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(
             DataIntegrityViolationException ex) {
