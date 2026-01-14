@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Core Technology Stack
 
-- **Spring Boot 3.2+** with Java 21
+- **Spring Boot 3.5+** with Java 21
 - **Spring Data JDBC** for database operations
 - **PostgreSQL** with Liquibase migrations
 - **Gradle** build system with wrapper
