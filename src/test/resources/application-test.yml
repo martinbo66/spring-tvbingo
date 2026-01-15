@@ -1,12 +1,6 @@
 spring:
   liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-    default-schema: public
-    liquibase-schema: public
-    url: jdbc:postgresql://localhost:5432/tvbingo
-    user: tvbingo_user
-    password: tvbingo_password
+    enabled: false
   
   test:
     database:

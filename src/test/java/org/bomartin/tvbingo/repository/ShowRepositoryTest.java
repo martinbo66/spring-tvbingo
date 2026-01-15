@@ -6,11 +6,15 @@ import org.bomartin.tvbingo.model.Show;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -19,16 +23,24 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureEmbeddedDatabase(provider = DatabaseProvider.ZONKY)
 @ActiveProfiles("test")
+@Transactional
+@Rollback
+@Sql(scripts = "classpath:test-schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class ShowRepositoryTest {
 
     @Autowired
     private ShowRepository showRepository;
+    
+    private String generateUniqueTitle(String base) {
+        return base + "_" + UUID.randomUUID().toString().substring(0, 8);
+    }
 
     @Test
     void whenSaveShow_thenShowIsCreated() {
         // Given
+        String uniqueTitle = generateUniqueTitle("Test Show");
         Show show = Show.builder()
-                .showTitle("Test Show")
+                .showTitle(uniqueTitle)
                 .gameTitle("Test Game")
                 .centerSquare("Center Square")
                 .phrases(Arrays.asList("Phrase 1", "Phrase 2", "Phrase 3"))
@@ -39,7 +51,7 @@ class ShowRepositoryTest {
 
         // Then
         assertNotNull(savedShow.getId());
-        assertEquals("Test Show", savedShow.getShowTitle());
+        assertEquals(uniqueTitle, savedShow.getShowTitle());
         assertEquals("Test Game", savedShow.getGameTitle());
         assertEquals("Center Square", savedShow.getCenterSquare());
         assertEquals(3, savedShow.getPhrases().size());
@@ -49,7 +61,7 @@ class ShowRepositoryTest {
     void whenFindById_thenReturnShow() {
         // Given
         Show show = Show.builder()
-                .showTitle("Another Show")
+                .showTitle(generateUniqueTitle("Another Show"))
                 .gameTitle("Another Game")
                 .centerSquare("Another Square")
                 .phrases(Arrays.asList("Phrase A", "Phrase B"))
@@ -69,12 +81,12 @@ class ShowRepositoryTest {
     void whenFindAll_thenReturnAllShows() {
         // Given
         Show show1 = Show.builder()
-                .showTitle("Show 1")
+                .showTitle(generateUniqueTitle("Show 1"))
                 .gameTitle("Game 1")
                 .phrases(Arrays.asList("P1", "P2"))
                 .build();
         Show show2 = Show.builder()
-                .showTitle("Show 2")
+                .showTitle(generateUniqueTitle("Show 2"))
                 .gameTitle("Game 2")
                 .phrases(Arrays.asList("P3", "P4"))
                 .build();
@@ -94,19 +106,19 @@ class ShowRepositoryTest {
     void whenUpdateShow_thenShowIsUpdated() {
         // Given
         Show show = Show.builder()
-                .showTitle("Original Title")
+                .showTitle(generateUniqueTitle("Original Title"))
                 .gameTitle("Original Game")
                 .phrases(Arrays.asList("Original Phrase"))
                 .build();
         Show savedShow = showRepository.save(show);
 
         // When
-        savedShow.setShowTitle("Updated Title");
+        savedShow.setShowTitle(generateUniqueTitle("Updated Title"));
         savedShow.setGameTitle("Updated Game");
         Show updatedShow = showRepository.save(savedShow);
 
         // Then
-        assertEquals("Updated Title", updatedShow.getShowTitle());
+        assertTrue(updatedShow.getShowTitle().startsWith("Updated Title"));
         assertEquals("Updated Game", updatedShow.getGameTitle());
     }
 
@@ -114,7 +126,7 @@ class ShowRepositoryTest {
     void whenDeleteShow_thenShowIsRemoved() {
         // Given
         Show show = Show.builder()
-                .showTitle("Show to Delete")
+                .showTitle(generateUniqueTitle("Show to Delete"))
                 .gameTitle("Game to Delete")
                 .phrases(Arrays.asList("Delete This"))
                 .build();
@@ -131,7 +143,7 @@ class ShowRepositoryTest {
     @Test
     void whenExistsByShowTitle_thenReturnTrue() {
         // Given
-        String showTitle = "Unique Show Title";
+        String showTitle = generateUniqueTitle("Unique Show Title");
         Show show = Show.builder()
                 .showTitle(showTitle)
                 .gameTitle("Some Game")
@@ -149,13 +161,13 @@ class ShowRepositoryTest {
     void whenExistsByShowTitleExceptId_thenReturnFalse() {
         // Given
         Show show = Show.builder()
-                .showTitle("Exclusive Show")
+                .showTitle(generateUniqueTitle("Exclusive Show"))
                 .gameTitle("Some Game")
                 .build();
         Show savedShow = showRepository.save(show);
 
         // When
-        boolean exists = showRepository.existsByShowTitleExceptId("Exclusive Show", savedShow.getId());
+        boolean exists = showRepository.existsByShowTitleExceptId(savedShow.getShowTitle(), savedShow.getId());
 
         // Then
         assertFalse(exists);

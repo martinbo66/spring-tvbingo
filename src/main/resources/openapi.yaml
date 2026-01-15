@@ -53,13 +53,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/FieldValidationError'
+              examples:
+                blank_title:
+                  summary: Missing show title
+                  value:
+                    showTitle: "Show title is required"
+                multiple_errors:
+                  summary: Multiple validation errors
+                  value:
+                    showTitle: "Show title is required"
         '409':
-          description: Show title already exists
+          description: Show title already exists (unique constraint violation)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/UniqueConstraintError'
+              examples:
+                duplicate_title:
+                  summary: Duplicate show title
+                  value:
+                    showTitle: "Show title must be unique"
 
   /api/shows/{id}:
     parameters:
@@ -109,15 +123,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/FieldValidationError'
+              examples:
+                blank_title:
+                  summary: Missing show title
+                  value:
+                    showTitle: "Show title is required"
         '404':
           description: Show not found
         '409':
-          description: Show title already exists
+          description: Show title already exists (unique constraint violation)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/UniqueConstraintError'
+              examples:
+                duplicate_title:
+                  summary: Duplicate show title
+                  value:
+                    showTitle: "Show title must be unique"
     delete:
       tags:
         - shows
@@ -162,18 +186,32 @@ components:
       properties:
         showTitle:
           type: string
-          description: Title of the TV show (must be unique)
+          minLength: 1
+          description: |
+            Title of the TV show. Must be unique across all shows.
+            
+            **Validation Rules:**
+            - Cannot be blank or contain only whitespace
+            - Must be unique (enforced by @UniqueShowTitle custom validator)
+            
+            **Error Messages:**
+            - If blank: "Show title is required"
+            - If not unique: "Show title must be unique"
+          example: "The Office"
         gameTitle:
           type: string
-          description: Title of the bingo game
+          description: Optional title for the bingo game variant
+          example: "Office Bingo - Season 1"
         centerSquare:
           type: string
-          description: Text for the center square of the bingo board
+          description: Text for the center square of the bingo board (typically a free space)
+          example: "Jim pranks Dwight"
         phrases:
           type: array
           items:
             type: string
-          description: List of phrases for the bingo squares
+          description: List of phrases for the bingo squares (defaults to empty array if not provided)
+          example: ["That's what she said", "Dwight eats a beet", "Michael burns his foot"]
       required:
         - showTitle
 
@@ -181,4 +219,23 @@ components:
       type: object
       additionalProperties:
         type: string
-      description: Map of field names to validation error messages 
+      description: Map of field names to validation error messages
+      example:
+        showTitle: "Show title must be unique"
+    
+    FieldValidationError:
+      type: object
+      additionalProperties:
+        type: string
+      description: Field-level validation errors for request validation failures
+      example:
+        showTitle: "Show title is required"
+        
+    UniqueConstraintError:
+      type: object
+      properties:
+        showTitle:
+          type: string
+          description: Error message for unique constraint violation
+          example: "Show title must be unique"
+      description: Specific error response for unique constraint violations (409 Conflict) 

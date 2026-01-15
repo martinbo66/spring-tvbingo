@@ -36,6 +36,12 @@ public class ShowService {
         if (show.getId() == null) {
             throw new IllegalArgumentException("Show ID must not be null for updates");
         }
+        
+        // Check if another show with the same title already exists (excluding current show)
+        if (showRepository.existsByShowTitleExceptId(show.getShowTitle(), show.getId())) {
+            throw new IllegalArgumentException("Show title must be unique");
+        }
+        
         return showRepository.save(show);
     }
     
